@@ -1,13 +1,20 @@
 package pinball2;
 
 public class Game {
+  private boolean paused = false;
+  
   public void init() {}
   
   public void preUpdate() {}
-  public void update(long dTimeNS) {}
+  public void update(long dTimeNS) {
+    if (paused) {
+      return;
+    }
+  }
   public void postUpdate() {}
   
-  public void preDraw() {}
-  public void draw() {}
-  public void postDraw() {}
+  
+  public void togglePause() {
+    paused = !paused;
+  }
 }

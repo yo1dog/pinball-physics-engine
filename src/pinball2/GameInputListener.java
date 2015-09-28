@@ -6,4 +6,8 @@ public class GameInputListener {
   public GameInputListener(Game game) {
     this.game = game;
   }
+  
+  public void pauseButtonPressed() {
+    game.togglePause();
+  }
 }

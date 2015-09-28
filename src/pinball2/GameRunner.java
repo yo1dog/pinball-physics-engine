@@ -14,6 +14,9 @@ public class GameRunner implements Runnable {
   }
   
   public void start() {
+    if (running)
+      return;
+    
     running = true;
     run();
   }
@@ -30,11 +33,7 @@ public class GameRunner implements Runnable {
       game.update(TARGET_FRAME_DURATION_NS);
       game.postUpdate();
       
-      Context drawContext = window.getDrawContext();
-      
-      game.preDraw();
-      game.draw(drawContext);
-      game.postDraw();
+      window.draw();
       
       long afterUpdateTimeNS = System.nanoTime();
       long updateDurationNS = afterUpdateTimeNS - beforeUpdateTimeNS;
