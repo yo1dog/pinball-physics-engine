@@ -1,16 +1,20 @@
 package pinball2.props;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 import pinball2.Vector;
 import pinball2.collisions.Collision;
 import pinball2.solids.Solid;
+import pinball2.solids.SurfaceProperties;
 import pinball2.solids.statics.StaticCircle;
 
 public class Bumper extends StaticCircle implements Prop {
   private final double activationForce;
   private final double pushForce;
   
-  protected Bumper(Vector pos, double radius, double activationForce, double pushForce) {
-    super(pos, radius);
+  public Bumper(Vector pos, double radius, double activationForce, double pushForce) {
+    super(pos, radius, new SurfaceProperties());
     
     this.activationForce = activationForce;
     this.pushForce = pushForce;
@@ -22,8 +26,17 @@ public class Bumper extends StaticCircle implements Prop {
   }
   
   @Override
-  public void onCollision(Collision collision) {
+  public void onCollision(Collision collision, Prop otherProp) {
     // TODO: add pushForce in direction of collision normal if collision force is >= activationForce
+  }
+  
+  @Override
+  public void draw(Graphics g) {
+    g.setColor(Color.RED);
+    g.drawOval(
+      (int)(pos.x - radius), (int)(pos.y - radius),
+      (int)(radius * 2), (int)(radius * 2)
+    );
   }
   
   @Override public void preUpdate() {}

@@ -1,5 +1,7 @@
 package pinball2.props;
 
+import java.awt.Graphics;
+
 import pinball2.collisions.Collision;
 import pinball2.solids.Solid;
 
@@ -13,5 +15,7 @@ public interface Prop {
   public void preSolidsExtrapolation();
   public void postSolidsExtrapolation();
   
-  public void onCollision(Collision collision);
+  public void onCollision(Collision collision, Prop otherProp);
+  
+  public void draw(Graphics g);
 }

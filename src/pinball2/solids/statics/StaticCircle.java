@@ -1,19 +1,16 @@
 package pinball2.solids.statics;
 
+import pinball2.Vector;
 import pinball2.solids.SurfaceProperties;
 
 public class StaticCircle extends StaticSolid {
-  public final double x, y;
+  public final Vector pos;
   public final double radius;
   
-  public StaticCircle(double x, double y, double radius) {
-    this(x, y, radius, new SurfaceProperties());
-  }
-  public StaticCircle(double x, double y, double radius, SurfaceProperties surfaceProperties) {
+  public StaticCircle(Vector pos, double radius, SurfaceProperties surfaceProperties) {
     super(surfaceProperties);
     
-    this.x = x;
-    this.y = y;
+    this.pos = pos;
     this.radius = radius;
   }
 }

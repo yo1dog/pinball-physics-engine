@@ -1,5 +1,7 @@
-package pinball2.components;
+package pinball2.tables;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import pinball2.Vector;
@@ -10,29 +12,25 @@ import pinball2.solids.Solid;
 import pinball2.solids.SurfaceProperties;
 import pinball2.solids.dynamics.DynamicSolid;
 
-public class Board {
+public abstract class Table {
   public static final double GRAVITY_ACC = -9.8d;
   
   public final int width, height;
   public final SurfaceProperties surfaceProperties;
   public final double elevationAngle;
-  public final Vector gravityAcc; // not really gravity but the acceleration due to the normal force applied by the board
+  public final Vector normalAcc; // acceleration due to the normal force applied by the tilted surface of the table
   
   private ArrayList<Prop> props;
   private ArrayList<Solid> solids;
   private ArrayList<DynamicSolid> dynamicSolids;
   
-  public Board(int width, int height) {
-    this(width, height, 0.349d/*~20deg*/, new SurfaceProperties());
-  }
-  
-  public Board(int width, int height, double elevationAngle, SurfaceProperties surfaceProperties) {
+  public Table(int width, int height, double elevationAngle, SurfaceProperties surfaceProperties) {
     this.width = width;
     this.height = height;
     this.elevationAngle = elevationAngle;
     this.surfaceProperties = surfaceProperties;
     
-    gravityAcc = new Vector(0, Math.sin(elevationAngle) * GRAVITY_ACC);
+    normalAcc = new Vector(0, -Math.sin(elevationAngle) * GRAVITY_ACC * 100);
     
     props = new ArrayList<Prop>();
   }
@@ -77,8 +75,8 @@ public class Board {
     
     // notify props of collisions
     for (Collision collision: collisions) {
-      collision.solidA.parentProp.onCollision(collision);
-      collision.solidB.parentProp.onCollision(collision.swapSolids());
+      collision.solidA.parentProp.onCollision(collision, collision.solidB.parentProp);
+      collision.solidB.parentProp.onCollision(collision, collision.solidA.parentProp);
     }
     
     // update props
@@ -97,4 +95,19 @@ public class Board {
   public void addProp(Prop prop) {
     props.add(prop);
   }
+  
+  
+  public void preDraw() {
+  }
+  public void draw(Graphics g, int pxWidth, int pxHeight, double mPerPx) {
+    // fill background
+    g.setColor(Color.WHITE);
+    g.fillRect(0, 0, width, height);
+    
+    // draw all props
+    for (Prop prop: props) {
+      prop.draw(g);
+    }
+  }
+  public void postDraw() {}
 }

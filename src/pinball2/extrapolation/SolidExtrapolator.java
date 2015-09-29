@@ -4,50 +4,55 @@ import java.util.ArrayList;
 
 import pinball2.collisions.Collision;
 import pinball2.collisions.CollisionDetector;
-import pinball2.components.Board;
 import pinball2.solids.Solid;
 import pinball2.solids.dynamics.DynamicSolid;
+import pinball2.tables.Table;
 
 public class SolidExtrapolator {
-  public static ArrayList<Collision> extrapolate(Board board, ArrayList<DynamicSolid> dynamicSolids, ArrayList<Solid> solids, double dTimeS) {
+  public static ArrayList<Collision> extrapolate(Table board, ArrayList<DynamicSolid> dynamicSolids, ArrayList<Solid> solids, double dTimeS) {
     ArrayList<Collision> collisions = new ArrayList<Collision>();
     
     Collision collision;
-    while((collision = extrapolateToFirstCollision(dynamicSolids, solids, dTimeS)) != null) {
-      collisions.add(collision);
+    do {
+      collision = extrapolateToFirstCollision(dynamicSolids, solids, dTimeS);
+      
+      if (collision != null) {
+        collisions.add(collision);
+      }
     }
+    while(collision != null && collisions.size() < 3);
     
-    // apply gravity
+    // for each dynamic solid...
     for (DynamicSolid dynamicSolid: dynamicSolids) {
-      dynamicSolid.accelerate(board.gravityAcc);
+      // apply table normal acceleration
+      dynamicSolid.accelerate(board.normalAcc, dTimeS);
+      
+      // apply table friction
+      dynamicSolid.applyFriction(board.normalAcc, board.surfaceProperties.cof, dTimeS);
     }
-    
-    // apply board friction
-    
-    
     
     return collisions;
   }
   
   public static Collision extrapolateToFirstCollision(ArrayList<DynamicSolid> dynamicSolids, ArrayList<Solid> solids, double maxDTimeS) {
-    Collision firstCollision = null;
+    Collision earliestCollision = null;
     
     // for each dynamic solid...
     for (DynamicSolid dynamicSolid: dynamicSolids) {
       // check if the solid will collide with another solid
-      Collision collision = CollisionDetector.detect(dynamicSolid, solids);
+      Collision collision = CollisionDetector.detect(dynamicSolid, solids, maxDTimeS);
       
       if (collision != null) {
-        if (firstCollision == null || collision.dTimeS < firstCollision.dTimeS) {
-          firstCollision = collision;
+        if (earliestCollision == null || collision.dTimeS < earliestCollision.dTimeS) {
+          earliestCollision = collision;
         }
       }
     }
     
-    // extrapolate until the first collision or for the remainder of the time
+    // extrapolate until the earliest collision or for the remainder of the time
     double dTimeS;
-    if (firstCollision != null) {
-      dTimeS = firstCollision.dTimeS;
+    if (earliestCollision != null) {
+      dTimeS = earliestCollision.dTimeS;
     }
     else {
       dTimeS = maxDTimeS;
@@ -56,18 +61,20 @@ public class SolidExtrapolator {
     // for each dynamic solid...
     for (DynamicSolid dynamicSolid: dynamicSolids) {
       // move the solid
-      // apply the collision if it involves the solid
-      Collision collision = null;
-      if (firstCollision.solidA == dynamicSolid) {
-        collision = firstCollision;
-      }
-      else if (firstCollision.solidB == dynamicSolid) {
-        collision = firstCollision.swapSolids();
-      }
-      
-      dynamicSolid.move(dTimeS, collision);
+      dynamicSolid.move(dTimeS);
     }
     
-    return firstCollision;
+    if (earliestCollision == null) {
+      return null;
+    }
+    
+    // apply the collision
+    earliestCollision.solidA.vel.add(earliestCollision.solidADVel);
+    
+    if (earliestCollision.solidB instanceof DynamicSolid) {
+      ((DynamicSolid)earliestCollision.solidB).vel.add(earliestCollision.solidBDVel);
+    }
+    
+    return earliestCollision;
   }
 }

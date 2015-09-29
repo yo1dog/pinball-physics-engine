@@ -48,6 +48,9 @@ public class Vector {
   public Vector getPerpendicular() {
     return new Vector(y, -x, mag);
   }
+  public Vector flip() {
+    return new Vector(-x, -y, mag);
+  }
   
   public Vector copy() {
     return new Vector(x, y, mag);

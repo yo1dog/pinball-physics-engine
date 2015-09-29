@@ -2,6 +2,7 @@ package pinball2;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,11 +18,11 @@ public class GameWindow extends JFrame implements ActionListener {
   private final GamePanel gamePanel;
   private final JButton pauseButton;
   
-  public GameWindow(GameDrawer drawer, GameInputListener inputListener) {
+  public GameWindow(Game game, GameInputListener inputListener) {
     super("Pinball 2.0");
     
     this.inputListener = inputListener;
-    gamePanel = new GamePanel(drawer);
+    gamePanel = new GamePanel(game);
     pauseButton = new JButton("Pause");
     
     JPanel buttonPannel = new JPanel();
@@ -33,8 +34,7 @@ public class GameWindow extends JFrame implements ActionListener {
     contentPane.add(buttonPannel, BorderLayout.SOUTH);
     
     pauseButton.addActionListener(this);
-    
-    setSize(500, 500);
+    setSize(400, 800);
   }
   
   public void display() {
@@ -43,6 +43,10 @@ public class GameWindow extends JFrame implements ActionListener {
   
   public void draw() {
     gamePanel.repaint();
+  }
+  
+  public void setGamePanelSize(int width, int height) {
+    gamePanel.setPreferredSize(new Dimension(width, height));
   }
   
   @Override
@@ -55,18 +59,18 @@ public class GameWindow extends JFrame implements ActionListener {
   
   private static class GamePanel extends JPanel {
     private static final long serialVersionUID = 1L;
-    private final GameDrawer drawer;
+    private final Game game;
     
-    public GamePanel(GameDrawer drawer) {
+    public GamePanel(Game game) {
       super();
-      this.drawer = drawer;
+      this.game = game;
     }
     
     @Override
     public void paintComponent(Graphics g) {
-      drawer.preDraw();
-      drawer.draw(g, getWidth(), getHeight());
-      drawer.postDraw();
+      game.preDraw();
+      game.draw(g, getWidth(), getHeight(), 1.0d);
+      game.postDraw();
 	}
   }
 }

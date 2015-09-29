@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
+encoding//src/pinball2/collisions/Collision.java=UTF-8
 encoding//src/pinball2/solids/dynamics/DynamicCircle.java=UTF-8
+encoding//src/pinball2/solids/dynamics/DynamicSolid.java=UTF-8
