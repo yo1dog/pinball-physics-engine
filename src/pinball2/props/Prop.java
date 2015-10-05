@@ -1,6 +1,6 @@
 package pinball2.props;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import pinball2.collisions.Collision;
 import pinball2.solids.Solid;
@@ -17,5 +17,5 @@ public interface Prop {
   
   public void onCollision(Collision collision, Prop otherProp);
   
-  public void draw(Graphics g);
+  public void draw(Graphics2D g2d);
 }

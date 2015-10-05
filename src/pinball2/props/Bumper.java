@@ -1,7 +1,8 @@
 package pinball2.props;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
 
 import pinball2.Vector;
 import pinball2.collisions.Collision;
@@ -31,12 +32,13 @@ public class Bumper extends StaticCircle implements Prop {
   }
   
   @Override
-  public void draw(Graphics g) {
-    g.setColor(Color.RED);
-    g.drawOval(
-      (int)(pos.x - radius), (int)(pos.y - radius),
-      (int)(radius * 2), (int)(radius * 2)
-    );
+  public void draw(Graphics2D g2d) {
+    g2d.setColor(Color.RED);
+    g2d.fill(new Ellipse2D.Double(
+      pos.x - radius,
+      pos.y - radius,
+      radius * 2, radius * 2
+    ));
   }
   
   @Override public void preUpdate() {}

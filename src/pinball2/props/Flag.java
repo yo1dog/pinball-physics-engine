@@ -1,7 +1,8 @@
 package pinball2.props;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 
 import pinball2.Vector;
 import pinball2.collisions.Collision;
@@ -31,12 +32,12 @@ public class Flag extends StaticLine implements Prop {
   }
   
   @Override
-  public void draw(Graphics g) {
-    g.setColor(Color.BLUE);
-    g.drawLine(
-      (int)end1.x, (int)end1.y,
-      (int)end2.x, (int)end2.y
-    );
+  public void draw(Graphics2D g2d) {
+    g2d.setColor(Color.BLUE);
+    g2d.fill(new Line2D.Double(
+      end1.x, end1.y,
+      end2.x, end2.y
+    ));
   }
   
   @Override public void preUpdate() {}

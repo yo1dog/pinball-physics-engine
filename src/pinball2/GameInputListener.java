@@ -10,4 +10,8 @@ public class GameInputListener {
   public void pauseButtonPressed() {
     game.togglePause();
   }
+  
+  public void mousePressed(double x, double y) {
+    game.mousePressed(x, y);
+  }
 }

@@ -1,6 +1,6 @@
 package pinball2;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import pinball2.tables.Table;
 import pinball2.tables.TestTable;
@@ -14,8 +14,6 @@ public class Game {
   }
   
   public void init(GameWindow window) {
-    window.setGamePanelSize(table.width, table.height);
-    
     table.init();
   }
   
@@ -44,14 +42,19 @@ public class Game {
   public void preDraw() {
     table.preDraw();
   }
-  public void draw(Graphics g, int pxWidth, int pxHeight, double mPerPx) {
-    table.draw(g, pxWidth, pxHeight, mPerPx);
+  public void draw(Graphics2D g2d) {
+    table.draw(g2d);
   }
   public void postDraw() {
     table.postDraw();
   }
   
+  
   public void togglePause() {
     paused = !paused;
+  }
+  
+  public void mousePressed(double x, double y) {
+    table.mousePressed(x, y);
   }
 }
