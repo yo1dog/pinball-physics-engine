@@ -11,10 +11,16 @@ public class TestTable extends Table {
   public TestTable() {
     super(1.0d, 2.0d, 0.349d/*~20deg*/, new SurfaceProperties());
     
-    ball = new Ball(new Vector(0.5, 0.5d), 0.05d);
+    ball = new Ball(new Vector(0.5, 1.0d - 0.125d - 0.05d - 0.01d), 0.05d);
     
     this.addProp(ball);
-    this.addProp(new Bumper(new Vector(0.5, 1.0d), 0.125d, 0.0d, 0.0d));
+    //this.addProp(new Bumper(new Vector(0.5d, 1.0d), 0.125d, 0.0d, 0.0d));
+    
+    this.addProp(new Bumper(new Vector(0.4, 1.0d), 0.125d, 0.0d, 0.0d));
+    this.addProp(new Bumper(new Vector(0.6, 0.9d), 0.125d, 0.0d, 0.0d));
+    this.addProp(new Bumper(new Vector(0.1, 0.75d), 0.125d, 0.0d, 0.0d));
+    this.addProp(new Bumper(new Vector(0.8, 0.6d), 0.125d, 0.0d, 0.0d));
+    
   }
 
   @Override

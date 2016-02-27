@@ -2,6 +2,7 @@ package pinball2.extrapolation;
 
 import java.util.ArrayList;
 
+import pinball2.Vector;
 import pinball2.collisions.Collision;
 import pinball2.collisions.CollisionDetector;
 import pinball2.solids.Solid;
@@ -9,27 +10,36 @@ import pinball2.solids.dynamics.DynamicSolid;
 import pinball2.tables.Table;
 
 public class SolidExtrapolator {
-  public static ArrayList<Collision> extrapolate(Table board, ArrayList<DynamicSolid> dynamicSolids, ArrayList<Solid> solids, double dTimeS) {
-    ArrayList<Collision> collisions = new ArrayList<Collision>();
-    
-    Collision collision;
-    do {
-      collision = extrapolateToFirstCollision(dynamicSolids, solids, dTimeS);
-      
-      if (collision != null) {
-        collisions.add(collision);
-      }
-    }
-    while(collision != null && collisions.size() < 3);
-    
+  public static ArrayList<Collision> extrapolate(Table table, ArrayList<DynamicSolid> dynamicSolids, ArrayList<Solid> solids, double dTimeS) {
     // for each dynamic solid...
     for (DynamicSolid dynamicSolid: dynamicSolids) {
       // apply table normal acceleration
-      dynamicSolid.accelerate(board.normalAcc, dTimeS);
+      dynamicSolid.accelerate(table.normalAcc, dTimeS);
       
       // apply table friction
-      dynamicSolid.applyFriction(board.normalAcc, board.surfaceProperties.cof, dTimeS);
+      dynamicSolid.applyFriction(table.normalAcc, table.surfaceProperties.cof, dTimeS);
     }
+    
+    
+    ArrayList<Collision> collisions = new ArrayList<Collision>();
+    
+    // the max time we should detect collisions and extrapolate for starts at the total time we are extrapolating for
+    double maxDTimeS = dTimeS;
+    
+    Collision collision;
+    // TODO: should loop while time remains instead of by collisions
+    do {
+      // extrapolate to the first collision
+      collision = extrapolateToFirstCollision(dynamicSolids, solids, maxDTimeS);
+      
+      if (collision != null) {
+        // if there was a collision, subtract time that was used from the max time
+        maxDTimeS -= collision.dTimeS;
+        collisions.add(collision);
+      }
+    }
+    // continue to extrapolate until no collision occurred
+    while(collision != null);
     
     return collisions;
   }
@@ -68,13 +78,17 @@ public class SolidExtrapolator {
       return null;
     }
     
+    
     // apply the collision
-    earliestCollision.solidA.vel.add(earliestCollision.solidADVel);
+    earliestCollision.solidA.vel = earliestCollision.solidA.vel.add(earliestCollision.solidADVel);
     
     if (earliestCollision.solidB instanceof DynamicSolid) {
-      ((DynamicSolid)earliestCollision.solidB).vel.add(earliestCollision.solidBDVel);
+      DynamicSolid dynSolidB = (DynamicSolid)earliestCollision.solidB;
+      
+      dynSolidB.vel = dynSolidB.vel.add(earliestCollision.solidBDVel);
     }
     
     return earliestCollision;
+    
   }
 }

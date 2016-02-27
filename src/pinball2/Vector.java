@@ -8,6 +8,8 @@ public class Vector {
     this.x = x;
     this.y = y;
     mag = calcMagnitude(x, y);
+    //boolean wasNan = Double.isNaN(x);
+    //if (!wasNan && Double.isNaN(x)) {System.out.println("Became NaN");}
   }
   public Vector(Vector vectorA, Vector vectorB) {
     x = vectorB.x - vectorA.x;
@@ -38,8 +40,11 @@ public class Vector {
   
   public Vector normalize() {
     // shortcut for this.scale(1 / mag);
-    double scale = 1/mag;
-    return new Vector(x*scale, y*scale, 1.0d);
+    if (mag == 0) {
+      return new Vector(0, 0, 0);      
+    }
+    
+    return new Vector(x/mag, y/mag, 1.0d);  
   }
   public Vector getNormal(Vector vector) {
     // shortcut for new Vector(this, vector).getPerpendicular().normalize()
@@ -60,7 +65,18 @@ public class Vector {
     return x == vector.x && y == vector.y;
   }
   
+  public double distance(Vector vectorB) {
+    double dx = vectorB.x - x;
+    double dy = vectorB.y - y;
+    
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  
   public static double calcMagnitude(double x, double y) {
     return Math.sqrt(x*x + y*y);
+  }
+  
+  public String toString() {
+    return "<" + this.x + ", " + this.y + ">";
   }
 }
