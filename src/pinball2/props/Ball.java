@@ -12,8 +12,17 @@ import pinball2.solids.SurfaceProperties;
 import pinball2.solids.dynamics.DynamicCircle;
 
 public class Ball extends DynamicCircle implements Prop {
+  Color color;
+  
   public Ball(Vector pos, double radius) {
-    super(pos, radius, new Vector(0.0d, 0.0d), new SurfaceProperties(), new BodyProperties());
+    this(pos, radius, Color.GREEN);
+  }
+  public Ball(Vector pos, double radius, Color color) {
+    this(pos, radius, color, new SurfaceProperties(0.05d, 0.3d), new BodyProperties());
+  }
+  public Ball(Vector pos, double radius, Color color, SurfaceProperties surfaceProperties, BodyProperties bodyProperties) {
+    super(pos, radius, new Vector(0.0d, 0.0d), surfaceProperties, bodyProperties);
+    this.color = color;
   }
   
   @Override
@@ -23,12 +32,22 @@ public class Ball extends DynamicCircle implements Prop {
   
   @Override
   public void draw(Graphics2D g2d) {
-    g2d.setColor(Color.GREEN);
+    g2d.setColor(color);
     g2d.fill(new Ellipse2D.Double(
       pos.x - radius,
       pos.y - radius,
       radius * 2, radius * 2
     ));
+    
+    /*
+    g2d.setColor(java.awt.Color.GRAY);
+    g2d.draw(new java.awt.geom.Line2D.Double(
+      pos.x,
+      pos.y,
+      pos.x + (vel.x * pinball2.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d),
+      pos.y + (vel.y * pinball2.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d)
+    ));
+    */
   }
   
   @Override public void preUpdate() {}

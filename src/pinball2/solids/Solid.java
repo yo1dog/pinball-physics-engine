@@ -5,7 +5,7 @@ import pinball2.solids.SurfaceProperties;
 
 public abstract class Solid {
   public Prop parentProp;
-  public final SurfaceProperties surfaceProperties;
+  public SurfaceProperties surfaceProperties;
   public boolean collisionsEnabled = true;
   
   public Solid(SurfaceProperties surfaceProperties) {

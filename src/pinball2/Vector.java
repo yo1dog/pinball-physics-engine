@@ -8,8 +8,6 @@ public class Vector {
     this.x = x;
     this.y = y;
     mag = calcMagnitude(x, y);
-    //boolean wasNan = Double.isNaN(x);
-    //if (!wasNan && Double.isNaN(x)) {System.out.println("Became NaN");}
   }
   public Vector(Vector vectorA, Vector vectorB) {
     x = vectorB.x - vectorA.x;
@@ -31,7 +29,7 @@ public class Vector {
     return new Vector(x - vector.x, y - vector.y);
   }
   public Vector scale(double scale) {
-    return new Vector(x*scale, y*scale, mag*scale);
+    return new Vector(x*scale, y*scale, Math.abs(mag*scale));
   }
   
   public double dot(Vector vector) {
@@ -41,19 +39,23 @@ public class Vector {
   public Vector normalize() {
     // shortcut for this.scale(1 / mag);
     if (mag == 0) {
-      return new Vector(0, 0, 0);      
+      return zero;     
     }
     
     return new Vector(x/mag, y/mag, 1.0d);  
   }
-  public Vector getNormal(Vector vector) {
-    // shortcut for new Vector(this, vector).getPerpendicular().normalize()
-    return new Vector(y - vector.y, vector.x - x).normalize();
+  public Vector getNormal() {
+    // shortcut for getPerpendicular().normalize()
+    if (mag == 0) {
+      return zero;      
+    }
+    
+    return new Vector(y/mag, -x/mag, 1.0d);  
   }
   public Vector getPerpendicular() {
     return new Vector(y, -x, mag);
   }
-  public Vector flip() {
+  public Vector invert() {
     return new Vector(-x, -y, mag);
   }
   
@@ -79,4 +81,6 @@ public class Vector {
   public String toString() {
     return "<" + this.x + ", " + this.y + ">";
   }
+  
+  public static final Vector zero = new Vector(0, 0, 0);
 }

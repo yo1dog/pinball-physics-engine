@@ -28,7 +28,12 @@ public class Bumper extends StaticCircle implements Prop {
   
   @Override
   public void onCollision(Collision collision, Prop otherProp) {
-    // TODO: add pushForce in direction of collision normal if collision force is >= activationForce
+    if (collision.solidCollisionForce.mag > activationForce) {
+      double accMag = -pushForce / collision.dynCircle.bodyProperties.mass;
+      Vector acc = collision.normal.scale(accMag);
+      
+      collision.dynCircle.vel = collision.dynCircle.vel.add(acc);
+    }
   }
   
   @Override

@@ -8,9 +8,9 @@ import pinball2.Vector;
 import pinball2.collisions.Collision;
 import pinball2.solids.Solid;
 import pinball2.solids.SurfaceProperties;
-import pinball2.solids.statics.StaticLine;
+import pinball2.solids.statics.StaticSegment;
 
-public class Flag extends StaticLine implements Prop {
+public class Flag extends StaticSegment implements Prop {
   public boolean isDown = false;
   
   public Flag(Vector end1, Vector end2) {
@@ -34,9 +34,8 @@ public class Flag extends StaticLine implements Prop {
   @Override
   public void draw(Graphics2D g2d) {
     g2d.setColor(Color.BLUE);
-    g2d.fill(new Line2D.Double(
-      end1.x, end1.y,
-      end2.x, end2.y
+    g2d.draw(new Line2D.Double(
+      p1.x, p1.y, p2.x, p2.y
     ));
   }
   

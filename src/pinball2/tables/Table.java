@@ -2,6 +2,7 @@ package pinball2.tables;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
@@ -22,8 +23,10 @@ public abstract class Table {
   public final Vector normalAcc; // acceleration due to the normal force applied by the tilted surface of the table
   
   private ArrayList<Prop> props;
-  private ArrayList<Solid> solids;
-  private ArrayList<DynamicSolid> dynamicSolids;
+  private ArrayList<Solid> solids = new ArrayList<Solid>();
+  private ArrayList<DynamicSolid> dynamicSolids = new ArrayList<DynamicSolid>();
+  
+  public ArrayList<Collision> frameCollisions = new ArrayList<Collision>(0);
   
   public Table(double width, double height, double elevationAngle, SurfaceProperties surfaceProperties) {
     this.width = width;
@@ -36,29 +39,7 @@ public abstract class Table {
     props = new ArrayList<Prop>();
   }
   
-  public void init() {
-    solids = new ArrayList<Solid>();
-    dynamicSolids = new ArrayList<DynamicSolid>();
-    
-    // for each prop...
-    for (Prop prop: props) {
-      // initiate the prop
-      Solid[] propSolids = prop.init();
-      
-      // add the prop's solids to the lists
-      for (int i = 0; i < propSolids.length; ++i) {
-        Solid solid = propSolids[i];
-        
-        solid.parentProp = prop;
-        
-        solids.add(solid);
-        
-        if (solid instanceof DynamicSolid) {
-          dynamicSolids.add((DynamicSolid)solid);
-        }
-      }
-    }
-  }
+  public void init() {}
   
   public void preUpdate() {}
   public void update(long dTimeNS) {
@@ -67,17 +48,16 @@ public abstract class Table {
       prop.preSolidsExtrapolation();
     }
     
-    double dTimeS = dTimeNS / 1000000000.0d;
-    ArrayList<Collision> collisions = SolidExtrapolator.extrapolate(this, dynamicSolids, solids, dTimeS);
-    
-    for (Prop prop: props) {
-      prop.postSolidsExtrapolation();
-    }
+    ArrayList<Collision> collisions = SolidExtrapolator.extrapolate(this, solids, dynamicSolids, dTimeNS);
     
     // notify props of collisions
     for (Collision collision: collisions) {
-      collision.solidA.parentProp.onCollision(collision, collision.solidB.parentProp);
-      collision.solidB.parentProp.onCollision(collision, collision.solidA.parentProp);
+      collision.dynCircle.parentProp.onCollision(collision, collision.solid.parentProp);
+      collision.solid.parentProp.onCollision(collision, collision.dynCircle.parentProp);
+    }
+    
+    for (Prop prop: props) {
+      prop.postSolidsExtrapolation();
     }
     
     // update props
@@ -90,11 +70,31 @@ public abstract class Table {
     for (Prop prop: props) {
       prop.postUpdate();
     }
+    
+    frameCollisions = collisions;
   }
   public void postUpdate() {}
   
   public void addProp(Prop prop) {
     props.add(prop);
+    
+    // add the prop's solids to the lists
+    Solid[] propSolids = prop.init();
+    
+    for (int i = 0; i < propSolids.length; ++i) {
+      Solid solid = propSolids[i];
+      if (solid == null) {
+        continue;
+      }
+      
+      solid.parentProp = prop;
+      
+      solids.add(solid);
+      
+      if (solid instanceof DynamicSolid) {
+        dynamicSolids.add((DynamicSolid)solid);
+      }
+    }
   }
   
   
@@ -109,8 +109,17 @@ public abstract class Table {
     for (Prop prop: props) {
       prop.draw(g2d);
     }
+    
+    // draw all collisions
+    for (Collision collision: frameCollisions) {
+      collision.draw(g2d);
+    }
+  }
+  public void drawHUD(Graphics2D g2d) {
+    g2d.setColor(Color.BLACK);
+    g2d.drawString("Collisions: " + frameCollisions.size(), 10, 20);
   }
   public void postDraw() {}
   
-  public abstract void mousePressed(double x, double y);
+  public abstract void mousePressed(double x, double y, MouseEvent mouseEvent);
 }

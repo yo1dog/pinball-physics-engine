@@ -17,5 +17,5 @@ public interface Prop {
   
   public void onCollision(Collision collision, Prop otherProp);
   
-  public void draw(Graphics2D g2d);
+  public abstract void draw(Graphics2D g2d);
 }

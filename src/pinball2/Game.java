@@ -1,6 +1,8 @@
 package pinball2;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 
 import pinball2.tables.Table;
 import pinball2.tables.TestTable;
@@ -8,6 +10,8 @@ import pinball2.tables.TestTable;
 public class Game {
   private boolean paused = false;
   private final Table table;
+  public int fps = 0;
+  public int tick = 0;
   
   public Game() {
     table = new TestTable();
@@ -45,6 +49,12 @@ public class Game {
   public void draw(Graphics2D g2d) {
     table.draw(g2d);
   }
+  public void drawHUD(Graphics2D g2d) {
+    g2d.setColor(Color.BLACK);
+    g2d.drawString("FPS: " + fps + " - " + tick, 10, 10);
+    
+    table.drawHUD(g2d);
+  }
   public void postDraw() {
     table.postDraw();
   }
@@ -54,7 +64,7 @@ public class Game {
     paused = !paused;
   }
   
-  public void mousePressed(double x, double y) {
-    table.mousePressed(x, y);
+  public void mousePressed(double x, double y, MouseEvent mouseEvent) {
+    table.mousePressed(x, y, mouseEvent);
   }
 }

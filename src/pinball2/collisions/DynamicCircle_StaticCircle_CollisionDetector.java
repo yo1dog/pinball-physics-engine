@@ -1,138 +1,122 @@
 package pinball2.collisions;
 
 import pinball2.Vector;
+import pinball2.solids.Solid;
 import pinball2.solids.dynamics.DynamicCircle;
 import pinball2.solids.statics.StaticCircle;
 
 public class DynamicCircle_StaticCircle_CollisionDetector {
-  public static Collision detect(DynamicCircle circleA, StaticCircle circleB, double dTimeS) {
-    if (circleA.vel.mag == 0) {
+  public static Collision detect(DynamicCircle circleA, StaticCircle circleB, double durS) {
+    double circleACollisionPointDist = detectCollisionDist(
+      circleA.pos, circleA.radius, circleA.vel,
+      circleB.pos, circleB.radius
+    );
+    
+    if (circleACollisionPointDist == -1) {
       return null;
     }
     
-    // solve for the possible times of collision
-    // find the time when the distance between the two circles' centers is equal to the sum of radii of the circles
-    // in vector match this is expressed as
-    // ||(p_a + v_a*t) - p_b|| = r_a + r_b
-    // but we can do it with linear algebra too
-    // d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
-    // d(t) = sqrt((x_b(t) - x_a(t))^2 + (y_b(t) - y_a(t))^2)
-    // x_a(t) = x_a + v_xa*t
-    // y_a(t) = y_a + v_ya*t
-    // x_b(t) = x_b
-    // y_b(t) = y_b
-    // d(t) = sqrt((x_b - (x_a + v_xa*t))^2 + (y_b - (y_a + v_ya*t))^2)
-    // solve for
-    // d(t) = r_a + r_b
-    // sqrt((x_b - (x_a + v_xa*t))^2 + (y_b - (y_a + v_ya*t))^2) = r_a + r_b
-    // after some algebra we find that
-    // t = (+-sqrt(Math.pow(2*(x_a*v_ax + y_a*v_ay - x_b*v_ax - y_b*v_ay), 2) - 4*(v_ax*v_ax + v_ay*v_ay)*(-2*x_a*x_b - 2*y_a*y_b + x_a*x_a + y_a*y_a + x_b*x_b + y_b*y_b - r_b*r_b - 2*r*r_a - r_a*r_a)) - (2*x_a*v_ax - 2*y_a*v_ay + 2*x_b*v_ax + 2*y_b*v_ay)) / (2*(v_ax*v_ax + v_ay*v_ay))
-    /*
-    t = (-sqrt((2*v_xa*x_a - 2*v_xa x_b + 2*v_ya*y_a - 2*v_ya*y_b)^2 - 4(v_xa^2 + v_ya^2)*(-r_1^2 - 2*r_2*r_1 - r_2^2 + x_a^2 + x_b^2 - 2*x_a*x_b + y_a^2 + y_b^2 - 2*y_a*y_b)) - 2*v_xa*x_a + 2*v_xa*x_b - 2*v_ya*y_a + 2*v_ya*y_b)/(2*(v_xa^2 + v_ya^2))
-    double f = Math.pow(2*(circleA.pos.x*circleA.vel.x + circleA.pos.y*circleA.vel.y - circleB.pos.x*circleA.vel.x - circleB.pos.y*circleA.vel.y), 2) - 4*(circleA.vel.x*circleA.vel.x + circleA.vel.y*circleA.vel.y)*(-2*circleA.pos.x*circleB.pos.x - 2*circleA.pos.y*circleB.pos.y + circleA.pos.x*circleA.pos.x + circleA.pos.y*circleA.pos.y + circleB.pos.x*circleB.pos.x + circleB.pos.y*circleB.pos.y - circleB.radius*circleB.radius - 2*circleB.radius*circleA.radius - circleA.radius*circleA.radius);
-    if (f < 0) {
-      return null;
+    // calculate the collision time
+    double dCollisionTimeS;
+    
+    // if the distance between circle A's position and the collision point is negative then circle A is overlapping circle B
+    if (circleACollisionPointDist < 0) {
+      // circle A should be moved outside of circle B immediately
+      dCollisionTimeS = 0;
     }
-    
-    double a = Math.sqrt(f);
-    double b = -2*circleA.pos.x*circleA.vel.x - 2*circleA.pos.y*circleA.vel.y + 2*circleB.pos.x*circleA.vel.x + 2*circleB.pos.y*circleA.vel.y;
-    double d = 2*(circleA.vel.x*circleA.vel.x + circleA.vel.y*circleA.vel.y);
-    
-    double t;
-    double t1 = (a + b) / d;
-    double t2 = (-a + b) / d;
-    */
-    /*
-    double f = Math.pow(2*circleA.vel.x*circleA.pos.x - 2*circleA.vel.x*circleB.pos.x + 2*circleA.vel.y*circleA.pos.y - 2*circleA.vel.y*circleB.pos.y, 2) - 4*(circleA.vel.x*circleA.vel.x + circleA.vel.y*circleA.vel.y)*(-(circleA.radius*circleA.radius) - 2*circleB.radius*circleA.radius - circleB.radius*circleB.radius + circleA.pos.x*circleA.pos.x + circleB.pos.x*circleB.pos.x - 2*circleA.pos.x*circleB.pos.x + circleA.pos.y*circleA.pos.y + circleB.pos.y*circleB.pos.y - 2*circleA.pos.y*circleB.pos.y);
-    if (f < 0) {
-      return null;
-    }
-    
-    double a = Math.sqrt(f);
-    double b = 2*circleA.vel.x*circleA.pos.x + 2*circleA.vel.x*circleB.pos.x - 2*circleA.vel.y*circleA.pos.y + 2*circleA.vel.y*circleB.pos.y;
-    double c = 2*(circleA.vel.x*circleA.vel.x + circleA.vel.y*circleA.vel.y);
-    
-    double t;
-    double t1 = (-a + b)/c;
-    double t2 = (a + b)/c;
-    
-    // both possible times of collision must be in the future
-    if (t1 < 0 || t2 < 0) {
-      return null;
-    }
-    
-    // choose the time that is soonest
-    if (t1 < t2) {
-      t = t1;
-    } 
     else {
-      t = t2;
+      // get the time it would take to travel that distance and check if it is within the given duration
+      dCollisionTimeS = circleACollisionPointDist / circleA.vel.mag;
     }
     
-    // make sure the collision will happen during the alloted time
-    if (t > dTimeS) {
+    // check if the collision will occur within the given duration
+    if (dCollisionTimeS > durS) {
       return null;
     }
-    */
     
-    // get the point along the velocity vector that is closest to the static circle
-    // create a vector from the dynamic circle's starting position to the static circle's position
-    // (remember that the velocity vector's origin is also the dynamic circle's starting position so these two
+    // start from circle A's position and move along the velocity vector for the distance between the circle A's position and
+    // the collision point
+    // we can not use the collision time to calculate this because it may be 0 because of overlapping
+    Vector circleACollisionPos = circleA.pos.add(circleA.vel.normalize().scale(circleACollisionPointDist));
+    
+    // the collision normal is always between the circle's centers
+    Vector collsionNormal = new Vector(circleACollisionPos, circleB.pos).normalize();
+    
+    // calculate the point of collision
+    Vector poc = circleACollisionPos.add(collsionNormal.scale(circleA.radius));
+    
+    // if the collision time is 0 then an overlap has occurred
+    if (dCollisionTimeS == 0) {
+      // use an impulse to resolve the overlap
+      Vector circleACollisionImpulse = new Vector(circleA.pos, circleACollisionPos);
+      return new Collision(circleA, circleB, collsionNormal, poc, circleACollisionImpulse);
+    }
+    
+    return new Collision(circleA, circleB, collsionNormal, poc, dCollisionTimeS);
+  }
+  
+  public static double detectCollisionDist(
+    Vector circleAPos, double circleARadius, Vector circleAVel,
+    Vector circleBPos, double circleBRadius
+  ) {
+    if (circleAVel.mag == 0) {
+      return -1;
+    }
+    
+    // get the point along the velocity vector that is closest to circle B's position
+    
+    // create a vector from the circle A's position to the circle B's position
+    // (remember that the velocity vector's origin is also the circle A's position so these two
     // vectors have the same origin)
-    Vector circleA_circleB = new Vector(circleA.pos, circleB.pos);
+    Vector circleA_circleB = new Vector(circleAPos, circleBPos);
     
-    // project that vector along the velocity vector
-    Vector circleAVelNormalized = circleA.vel.normalize();
-    double closestPointProj = circleA_circleB.dot(circleAVelNormalized);
+    // project the A->B vector along the velocity vector's normal to get the distance between the closest point
+    // and circle B's position. We can do this because the line between the closest point and circle B's position
+    // will always be perpendicular to the velocity vector
+    // we must take the absolute value as circle B's position can be on either side of the velocity vector which
+    // means the projection would be negative if circle B's position is on the side opposite of the velocity
+    // normal's direction
+    double closestPointCircleBDist = Math.abs(circleA_circleB.dot(circleAVel.getNormal()));
     
-    // if the projection is negative then the collision point will be in the opposite direction of the velocity
-    if (closestPointProj < 0) {
-      return null;
+    // check if the distance between the closest point and the circle B's position is close enough to cause a collision
+    if (closestPointCircleBDist >= circleARadius + circleBRadius) {
+      return -1;
     }
     
-    // scale the normalized velocity vector by the projection and add it to the dynamic circle's starting position
-    // to give us the closest point along the velocity vector to the static circle's point
-    Vector closestPoint = circleA.pos.add(circleAVelNormalized.scale(closestPointProj));
+    // project the A->B vector along the velocity vector to get the distance between circle A's position and the closest point
+    Vector circleAVelNormalized = circleAVel.normalize();
+    double circleA_closestPointDist = circleA_circleB.dot(circleAVelNormalized);
     
-    // check if the distance between the closest point along the velocity vector and the static circle's point is close enough to cause a collision
-    double closestPointCircleBDist = closestPoint.distance(circleB.pos);
-    if (closestPointCircleBDist > circleA.radius + circleB.radius) {
-      return null;
+    // if the projection is negative then the collision point would be in the opposite direction of the velocity
+    if (circleA_closestPointDist < 0) {
+      return -1;
     }
     
-    // moving towards the starting position of the dynamic circle, calculate were the collision will take place
-    // the collision position will be where the distance between the two circles is equal to the sum of the circles' radii
-    // we can imagine a right triangle between the closest point, the static circle's point, and the collision point with the right angle
-    // being at the closest point
-    // the hypotinus (c) must be equal to the sum of the radii and we already calculated the distance between the closest point
-    // and the static circle's point (a).
-    // use a^2 + b^2 = c^2 to solve the last leg of the triangle which extends along the velocity vector but in the opposite direction (towards
-    // the dynamic circle's starting position)
-    // b = sqrt(c^2 - a^2)
-    double c = circleA.radius + circleB.radius;
-    double a = closestPointCircleBDist;
-    double b = Math.sqrt(c*c - a*a);
+    // moving in the opposite direction as the velocity vector, calculate the point along the velocity vector a collision
+    // would take place
+    // the collision will be where the distance between the two circles is equal to the sum of the circles' radii.
+    // Draw circle A and circle B so that they are touching. Now draw a line that represents circle A's velocity vector that
+    // runs through circle A's center. Draw a second line perpendicular to circle A's velocity vector that runs through circle
+    // B's center. Where these two lines intersect is the closest point that we found above. Let's call this point C. Finally,
+    // draw a line from circle B's center (point B) to circle A's center (point A). ABC creates a right triangle with the right
+    // angle at point C. |A->B| is equal to circle A's radius + circle B's radius. We already calculated the distance between
+    // the closest point and circle B's position (|C->B|). We can use the Pythagorean theorem to find the final side of the
+    // triangle |A->C|:
+    // |A-C|^2 + |C->B|^2 = |A->B|^2
+    // |A-C| = sqrt(|A->B|^2 - |C->B|^2)
+    double a_bMag = circleARadius + circleBRadius;
+    double c_bMag = closestPointCircleBDist;
+    double a_cMag = Math.sqrt(a_bMag*a_bMag - c_bMag*c_bMag);
     
-    // we can now find the distance the dynamic circle will have to travel along it's velocity vector to collide with the static circle
-    // (the projection we calculated earlier is the distance along the velocity vector to the closest point. b is the distance from the closest
-    // point to the collision point along the velocity vector in the opposite direction)
-    double collisionDist = closestPointProj - b;
+    // this gives us the distance from the closest point to the collision point along the velocity vector's opposite
+    double closestPoint_collisionPointDist = a_cMag;
     
-    // check if the circle will be able to travel that distance within the alloted time
-    // get the time it would take to travel that distance and check if we have been alloted that much
-    double collisionTime = collisionDist / circleA.vel.mag;
-    if (collisionTime > dTimeS) {
-      return null;
-    }
-    
-    System.out.println(collisionTime);
-    
-    // start from the closest point and move the length of b along the velocity vector but in the opposite direction to get the collision point
-    Vector collisionPoint = closestPoint.subtract(circleAVelNormalized.scale(b));
-    
-    // calculate the collision normal
-    Vector collsionNormal = new Vector(collisionPoint, circleB.pos).normalize();
-    
-    return new Collision(circleA, circleB, collisionTime, collsionNormal);
+    // we can now find the distance circle A will have to travel along it's velocity vector to collide with circle B
+    // earlier we calculated the distance from circle A's position to the closest point along the velocity vector. Then
+    // we calculated the distance between the closest point and the collision point along the velocity vector's opposite.
+    // So, we can subtract the distance from the closest point to the collision point from the distance from circle A's
+    // position to the closest point to get the distance from circle A's position to the collision point along the velocity
+    // vector.
+    return circleA_closestPointDist - closestPoint_collisionPointDist;
   }
 }

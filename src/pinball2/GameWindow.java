@@ -1,11 +1,13 @@
 package pinball2;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -42,7 +44,11 @@ public class GameWindow extends JFrame implements ActionListener {
     contentPane.add(buttonPannel, BorderLayout.SOUTH);
     
     pauseButton.addActionListener(this);
-    setSize(400, 800);
+    setSize(600, 900);
+  }
+  
+  public static interface Drawer {
+    public void draw(Graphics2D g2d);
   }
   
   public void display() {
@@ -50,7 +56,11 @@ public class GameWindow extends JFrame implements ActionListener {
   }
   
   public void draw() {
-    gamePanel.repaint();
+   draw(null);
+  }
+  public void draw(Drawer extraDrawer) {
+    gamePanel.extraDrawer = extraDrawer;
+    gamePanel.paintImmediately(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
   }
   
   public void setGamePanelSize(int width, int height) {
@@ -61,6 +71,7 @@ public class GameWindow extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private final Game game;
     private final GameInputListener inputListener;
+    private Drawer extraDrawer;
     
     public final double pxPerM = 400;
     
@@ -74,27 +85,38 @@ public class GameWindow extends JFrame implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
       Graphics2D g2d = (Graphics2D)g;
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       
       g2d.setColor(Color.BLACK);
       g2d.fillRect(0, 0, getWidth(), getHeight());
       
-      //AffineTransform originalTransform = g2d.getTransform();
+      AffineTransform originalTransform = g2d.getTransform();
       AffineTransform transform = new AffineTransform();
       transform.setToScale(pxPerM, pxPerM);
       g2d.transform(transform);
+      
+      g2d.setStroke(new BasicStroke((float)(1 / pxPerM)));
       
       game.preDraw();
       game.draw(g2d);
       game.postDraw();
       
-      //g2d.setTransform(originalTransform);
+      if (extraDrawer != null) {
+        extraDrawer.draw(g2d);
+      }
+      
+      g2d.setTransform(originalTransform);
+      
+      game.drawHUD(g2d);
 	}
     
     @Override public void mousePressed(MouseEvent e) {
       int x = e.getX();
       int y = e.getY();
       
-      inputListener.mousePressed(x / pxPerM, y / pxPerM);
+      synchronized(game) {
+        inputListener.mousePressed(x / pxPerM, y / pxPerM, e);
+      }
     }
 
     @Override public void mouseClicked(MouseEvent e) {}

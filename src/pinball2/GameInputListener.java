@@ -1,5 +1,7 @@
 package pinball2;
 
+import java.awt.event.MouseEvent;
+
 public class GameInputListener {
   private final Game game;
   
@@ -11,7 +13,7 @@ public class GameInputListener {
     game.togglePause();
   }
   
-  public void mousePressed(double x, double y) {
-    game.mousePressed(x, y);
+  public void mousePressed(double x, double y, MouseEvent mouseEvent) {
+    game.mousePressed(x, y, mouseEvent);
   }
 }

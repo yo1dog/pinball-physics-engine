@@ -8,24 +8,28 @@ import pinball2.Vector;
 import pinball2.collisions.Collision;
 import pinball2.solids.Solid;
 import pinball2.solids.SurfaceProperties;
-import pinball2.solids.statics.StaticLine;
+import pinball2.solids.statics.StaticSegment;
 
-public class Wall extends StaticLine implements Prop {
-  public Wall(Vector end1, Vector end2) {
-    super(end1, end2, new SurfaceProperties());
+public class Wall implements Prop {
+  private final StaticSegment segment1;
+  private final StaticSegment segment2;
+  
+  public Wall(Vector p1, Vector p2, boolean isDoubleSided) {
+    segment1 = new StaticSegment(p1, p2, new SurfaceProperties());
+    segment2 = isDoubleSided? new StaticSegment(p2, p1, new SurfaceProperties()) : null;
   }
   
   @Override
   public Solid[] init() {
-    return new Solid[] {this};
+    return new Solid[] {segment1, segment2};
   }
   
   @Override
   public void draw(Graphics2D g2d) {
     g2d.setColor(Color.BLACK);
-    g2d.fill(new Line2D.Double(
-      end1.x, end1.y,
-      end2.x, end2.y
+    g2d.draw(new Line2D.Double(
+      segment1.p1.x, segment1.p1.y,
+      segment1.p2.x, segment1.p2.y
     ));
   }
   
