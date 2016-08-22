@@ -14,6 +14,5 @@ The project started just as an interest in building a physics engine. At some po
 kind of pinball game and the project shifted towards that goal.
 <!-- /desc -->
 
------
 [Try it Out](.yo1dog/pinballPhysicsEngine.jar?raw=true)
 <!-- /exec -->
