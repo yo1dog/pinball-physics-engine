@@ -2,7 +2,6 @@ package com.yo1dog.pinball_physics_engine.extrapolation;
 
 import java.util.ArrayList;
 
-import com.yo1dog.pinball_physics_engine.Pinball2;
 import com.yo1dog.pinball_physics_engine.collisions.Collision;
 import com.yo1dog.pinball_physics_engine.collisions.CollisionDetector;
 import com.yo1dog.pinball_physics_engine.solids.Solid;
@@ -55,11 +54,12 @@ public class SolidExtrapolator {
         }
         
         /*
+        // draw between every collision
         table.frameCollisions = new ArrayList<Collision>(1);
         table.frameCollisions.add(collision);
         double x2 = collision.dynCircle.pos.x + collision.dynCircle.vel.x * (extrapolateDurS - earliestCollisionDTimeS);
         double y2 = collision.dynCircle.pos.y + collision.dynCircle.vel.y * (extrapolateDurS - earliestCollisionDTimeS);
-        Pinball2.window.draw(new pinball2.GameWindow.Drawer() {
+        com.yo1dog.pinball_physics_engine.Main.window.draw(new com.yo1dog.pinball_physics_engine.GameWindow.Drawer() {
           @Override
           public void draw(java.awt.Graphics2D g2d) {
             g2d.setColor(java.awt.Color.GRAY);
@@ -102,8 +102,11 @@ public class SolidExtrapolator {
       }
     }
     
+    /*
+    // draw between every extrapolation
     table.frameCollisions = collisions;
-    Pinball2.window.draw();
+    com.yo1dog.pinball_physics_engine.Main.window.draw();
+    */
     
     return collisions;
   }

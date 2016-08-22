@@ -51,7 +51,7 @@ public class Game {
   }
   public void drawHUD(Graphics2D g2d) {
     g2d.setColor(Color.BLACK);
-    g2d.drawString("FPS: " + fps + " - " + tick, 10, 10);
+    g2d.drawString("FPS: " + fps + " - " + tick, 10, 15);
     
     table.drawHUD(g2d);
   }

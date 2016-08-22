@@ -40,12 +40,13 @@ public class Ball extends DynamicCircle implements Prop {
     ));
     
     /*
+    // draw velocity
     g2d.setColor(java.awt.Color.GRAY);
     g2d.draw(new java.awt.geom.Line2D.Double(
       pos.x,
       pos.y,
-      pos.x + (vel.x * pinball2.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d),
-      pos.y + (vel.y * pinball2.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d)
+      pos.x + (vel.x * com.yo1dog.pinball_physics_engine.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d),
+      pos.y + (vel.y * com.yo1dog.pinball_physics_engine.GameRunner.TARGET_FRAME_DURATION_NS / 1000000000.0d)
     ));
     */
   }

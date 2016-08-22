@@ -16,8 +16,10 @@ import java.awt.geom.AffineTransform;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+
 
 public class GameWindow extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
@@ -27,7 +29,7 @@ public class GameWindow extends JFrame implements ActionListener {
   private final JButton pauseButton;
   
   public GameWindow(Game game, GameInputListener inputListener) {
-    super("Pinball 2.0");
+    super("Pinball Physics Engine");
     
     this.inputListener = inputListener;
     gamePanel = new GamePanel(game, inputListener);
@@ -38,13 +40,24 @@ public class GameWindow extends JFrame implements ActionListener {
     JPanel buttonPannel = new JPanel();
     buttonPannel.add(pauseButton);
     
+    JPanel instructionsPannel = new JPanel();
+    instructionsPannel.add(new JLabel(
+      "<html>"
+      + "Instructions:<br />"
+      + "Left click to place ball 1.<br />"
+      + "Right click to place ball 2.<br />"
+      + "Middle mouse button to create a new ball.<br />"
+      + "Space to pause."
+      + "</html>"));
+    
     Container contentPane = getContentPane();
     contentPane.setLayout(new BorderLayout());
-    contentPane.add(gamePanel,    BorderLayout.CENTER);
-    contentPane.add(buttonPannel, BorderLayout.SOUTH);
+    contentPane.add(gamePanel,          BorderLayout.CENTER);
+    contentPane.add(buttonPannel,       BorderLayout.SOUTH);
+    contentPane.add(instructionsPannel, BorderLayout.WEST);
     
     pauseButton.addActionListener(this);
-    setSize(600, 900);
+    setSize(900, 900);
   }
   
   public static interface Drawer {

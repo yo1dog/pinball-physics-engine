@@ -117,7 +117,7 @@ public abstract class Table {
   }
   public void drawHUD(Graphics2D g2d) {
     g2d.setColor(Color.BLACK);
-    g2d.drawString("Collisions: " + frameCollisions.size(), 10, 20);
+    g2d.drawString("Collisions: " + frameCollisions.size(), 10, 28);
   }
   public void postDraw() {}
   
